@@ -1,13 +1,24 @@
 import express from 'express'
 import cookieParser from 'cookie-parser'
-
+import cors from 'cors'
 import {ENV} from './utils/env.js'
 import path from 'path'
 import authRoute from './routes/authRoute.js'
 import messageRoute from './routes/messageRoute.js'
 import { connectDB } from './config/db.js'
+
+
+import aj from './utils/arcjet.js';
+
+if (process.env.NODE_ENV !== "development") {
+  app.use(aj.middleware());
+}
+
+
 const app=express()
+
 const __dirname=path.resolve();
+app.use(cors({origin:ENV.CLIENT_URL,credentials:true}))
 
 const PORT=ENV.PORT || 3000
 //payload too large

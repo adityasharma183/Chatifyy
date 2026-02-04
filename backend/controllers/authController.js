@@ -4,66 +4,75 @@ import { generateToken } from "../utils/Token.js"
 import bcrypt, { genSalt } from 'bcryptjs'
 import { ENV } from "../utils/env.js"
 import cloudinary from "../utils/cloudinary.js"
-export const signUp=async (req,res)=>{
-    try {
-        const {fullName,email,password}=req.body
-    if(!fullName || !email || !password){
-        return res.status(400).json({message:'Please enter all credentials'})
+
+
+export const signUp = async (req, res) => {
+  try {
+    const { fullName, email, password } = req.body;
+
+    if (!fullName || !email || !password) {
+      return res.status(400).json({ message: "Please enter all credentials" });
     }
-    if(password.length<6){
-        return res.status(400).json({message:'Password should be at least 6 characters'})
+
+    if (password.length < 6) {
+      return res
+        .status(400)
+        .json({ message: "Password should be at least 6 characters" });
     }
+
     const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-    if(!emailRegex.test(email)){
-        return res.status(400).json({message:'Invalid email format'})
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
     }
 
-    const user=await User.findOne({email})
-    if(user){return res.status(400).json({message:'Email already exists'})}
-
-    //hash password 
-    const salt=await bcrypt.genSalt(10)
-    const hashedPassword=await bcrypt.hash(password,salt)
-
-    //create user
-    const newUser=new User({
-        fullName,email, password: hashedPassword
-    })
-    if (newUser) {
-       //persists user first ,then generate token
-       const savedUser= await newUser.save()
-         generateToken(newUser._id,res)
-        res.status(201).json({
-            _id:newUser._id,
-            fullName:newUser.fullName,
-            email:newUser.email,
-            profilePic:newUser.profilePic
-        })
-        //send welcome email
-        try {
-            await sendWelcomeEmail(ENV.EMAIL_ADI,savedUser.fullName,ENV.CLIENT_URL)
-            
-        } catch (error) {
-            console.error('Failed to send welcome email')
-            
-        }
-
-        
-    } else {
-        res.status(400).json({message:'Invalid user data'})
-        
-        
+    const user = await User.findOne({ email });
+    if (user) {
+      return res.status(400).json({ message: "Email already exists" });
     }
 
-        
-    } catch (error) {
-        console.log('Error in signup controller',error);
-        res.status(500).json({message:'Internal server error'})
-        
-        
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const newUser = new User({
+      fullName,
+      email,
+      password: hashedPassword,
+    });
+
+    if (!newUser) {
+      return res.status(400).json({ message: "Invalid user data" });
     }
 
-}
+    const savedUser = await newUser.save();
+
+    generateToken(savedUser._id, res);
+
+    // ✅ RETURN HERE (MOST IMPORTANT FIX)
+    return res.status(201).json({
+      _id: savedUser._id,
+      fullName: savedUser.fullName,
+      email: savedUser.email,
+      profilePic: savedUser.profilePic,
+    });
+
+    // ❌ This will NEVER block response now
+    // (safe fire-and-forget)
+    // sendWelcomeEmail(
+    //   ENV.EMAIL_ADI,
+    //   savedUser.fullName,
+    //   ENV.CLIENT_URL
+    // ).catch(() => console.error("Failed to send welcome email"));
+
+  } catch (error) {
+    console.log("Error in signup controller", error);
+
+    // ✅ Guard against double response
+    if (!res.headersSent) {
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  }
+};
+
 
 //LOGIN 
 export const login = async (req, res) => {

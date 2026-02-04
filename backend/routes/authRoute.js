@@ -6,13 +6,14 @@ import { arcjetProtection } from '../middlewares/arcjetMidddleware.js'
 
 
 router.use(arcjetProtection)
+
 router.post('/signup',signUp)
 
 router.post('/login',login)
 
 router.post('/logout',logout)
 
-router.put('update-profile',protectRoute,updateProfile)
+router.put('/update-profile',protectRoute,updateProfile)
 
 router.get('/check',protectRoute,(req,res)=>{
     res.status(200).json(req.user)
