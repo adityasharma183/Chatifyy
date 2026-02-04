@@ -2,6 +2,8 @@ import User from "../models/User.js";
 import Message from "../models/Messages.js";
 import cloudinary from "../utils/cloudinary.js";
 
+
+//get all contacts
 export const getAllContacts=async(req,res)=>{
     try {
         const loggedInUser=req.user._id
@@ -12,14 +14,29 @@ export const getAllContacts=async(req,res)=>{
     }
 }
 
-export const getChatPartners=()=>{
+
+//get chat partners
+export const getChatPartners=async (req,res)=>{
     try {
+        const loggedInUser=req.user._id
+        //find all the messages where sender or receiver is logged in user
+        const messages=await Message.find({$or:[{senderId:loggedInUser},{receiverId:loggedInUser}]})
+        //give all the receiverIds of the messages where sender is loggedIn user
+        const chatPartnerIds=[...new Set(messages.map((msg)=>
+        msg.senderId.toString()===loggedInUser.toString()?msg.receiverId.toString():msg.senderId.toString()))]
+        //then extract chat partners from ids
+        const chatPartner=await User.find({_id:{$in:chatPartnerIds}}).select('-password')
+        return res.status(200).json(chatPartner)
         
     } catch (error) {
+        console.error('Error in the get chat partners controller',error)
+        return res.status(500).json({message:'Internal server error'})
         
     }
 }
 
+
+//get messages  by id
 export const getMessagesById=async(req,res)=>{
     try {
         const myId=req.user._id
@@ -42,6 +59,7 @@ export const getMessagesById=async(req,res)=>{
 }
 
 
+// send message
 export const sendMessage = async (req, res) => {
   try {
     const { text, image } = req.body;
