@@ -33,6 +33,10 @@ app.use('/api/auth',authRoute)
 app.use('/api/messages',messageRoute)
 
 
+app.get("/", (req, res) => {
+  res.send("Backend is running 🚀");
+});
+
 /// make ready for deployment
 if(ENV.NODE_ENV==="production"){
     app.use(express.static(path.join(__dirname,"../frontend/dist")))

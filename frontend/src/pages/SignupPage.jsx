@@ -1,8 +1,8 @@
-import React,{useState} from 'react'
-import { useAuthStore } from '../store/useAuthStore'
-import BorderAnimatedContainer from '../components/BorderAnimatedContainer'
-import { MessageCircleIcon,LockIcon,MailIcon,UserIcon,LoaderIcon } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { useState } from "react";
+import { useAuthStore } from "../store/useAuthStore";
+import BorderAnimatedContainer from "../components/BorderAnimatedContainer";
+import { MessageCircleIcon, LockIcon, MailIcon, UserIcon, LoaderIcon } from "lucide-react";
+import { Link } from "react-router";
 
 function SignUpPage() {
   const [formData, setFormData] = useState({ fullName: "", email: "", password: "" });
@@ -60,10 +60,10 @@ function SignUpPage() {
                         placeholder="johndoe@gmail.com"
                       />
                     </div>
-                  </div> 
+                  </div>
 
                   {/* PASSWORD INPUT */}
-                   <div>
+                  <div>
                     <label className="auth-input-label">Password</label>
                     <div className="relative">
                       <LockIcon className="auth-input-icon" />
@@ -76,28 +76,28 @@ function SignUpPage() {
                         placeholder="Enter your password"
                       />
                     </div>
-                  </div> 
+                  </div>
 
                   {/* SUBMIT BUTTON */}
-                   <button className="auth-btn" type="submit" disabled={isSigningUp}>
+                  <button className="auth-btn" type="submit" disabled={isSigningUp}>
                     {isSigningUp ? (
                       <LoaderIcon className="w-full h-5 animate-spin text-center" />
                     ) : (
                       "Create Account"
                     )}
-                  </button> 
+                  </button>
                 </form>
 
-                 <div className="mt-6 text-center">
+                <div className="mt-6 text-center">
                   <Link to="/login" className="auth-link">
                     Already have an account? Login
                   </Link>
-                </div> 
+                </div>
               </div>
             </div>
 
             {/* FORM ILLUSTRATION - RIGHT SIDE */}
-             <div className="hidden md:w-1/2 md:flex items-center justify-center p-6 bg-gradient-to-bl from-slate-800/20 to-transparent">
+            <div className="hidden md:w-1/2 md:flex items-center justify-center p-6 bg-gradient-to-bl from-slate-800/20 to-transparent">
               <div>
                 <img
                   src="/signup.png"
@@ -114,7 +114,7 @@ function SignUpPage() {
                   </div>
                 </div>
               </div>
-            </div> 
+            </div>
           </div>
         </BorderAnimatedContainer>
       </div>
